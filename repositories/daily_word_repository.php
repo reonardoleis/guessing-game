@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__DIR__)."../database/database.php");
+require_once(dirname(__DIR__)."/database/database.php");
 
 function create_daily_word($word) {
     $now = date("Y-m-d H:i:s");

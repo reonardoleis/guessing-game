@@ -1,5 +1,5 @@
 <?php
-include_once(dirname(__DIR__)."../http/json.php");
+include_once(dirname(__DIR__)."/http/json.php");
 function method($methods) {
     $method = $_SERVER["REQUEST_METHOD"];
     if (!in_array($method, $methods)) {

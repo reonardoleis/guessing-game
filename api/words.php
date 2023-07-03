@@ -1,7 +1,7 @@
 <?php
-include_once(dirname(__DIR__)."../middlewares/method_middleware.php");
-include_once(dirname(__DIR__)."../repositories/daily_word_repository.php");
-include_once(dirname(__DIR__)."../http/json.php");
+include_once(dirname(__DIR__)."/middlewares/method_middleware.php");
+include_once(dirname(__DIR__)."/repositories/daily_word_repository.php");
+include_once(dirname(__DIR__)."/http/json.php");
 
 method(array("POST", "GET"));
 
@@ -26,7 +26,7 @@ function guess_word() {
 
     for ($i = 0; $i < count($word_seq); $i++) {
         if ($word_seq[$i] == $current_word_seq[$i]) {
-            $correct_letters[$i] = array("letter" => $word_seq[$i], "position" => true, "exists" => true);
+            $correct_letters[$i] = array("position" => true, "exists" => true);
         } else {
             $occurrences_in_current_word = array_keys($current_word_seq, $word_seq[$i]);
             $occurrences_in_correct_letters = array_keys($correct_letters, array("letter" => $word_seq[$i], "position" => true, "exists" => true));
@@ -39,7 +39,7 @@ function guess_word() {
         }
     }
 
-    echo JSON(array("word" => $current_word, "is_correct" => $word == $current_word, "correct_letters" => $correct_letters) , 200);
+    echo JSON(array("is_correct" => $word == $current_word, "correct_letters" => $correct_letters) , 200);
 
     die();
 }
