@@ -1,6 +1,6 @@
 <?php
 include_once("../middlewares/method_middleware.php");
-method(array("POST"));
+method(array("GET"));
 include_once("../middlewares/job_middleware.php");
 include_once("../http/json.php");
 include_once("../repositories/daily_word_repository.php");
