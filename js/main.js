@@ -1,4 +1,4 @@
-const apiURL = `${window.location.href.split('/')[0]}/api`;
+const apiURL = `${window.location.href.split('/')[0]}/guessing-game/api`;
 const maxAttempts = 6;
 var attempts = 0;
 
