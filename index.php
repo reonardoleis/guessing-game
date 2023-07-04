@@ -18,10 +18,10 @@ date_default_timezone_set("UTC");
     <link rel="stylesheet" href="css/style.css?r=<?php echo rand(0, 2 ** 16); ?>" />
     <script>
         let nextWordTimestamp = <?php
-                                $tomorrow_midnight_utc = strtotime("tomorrow");
-                                // convert to JS style timestamp
-                                $tomorrow_midnight_utc *= 1000;
-                                echo $tomorrow_midnight_utc;
+                                $dt = new DateTime("now");
+                                $s = 600;
+                                $dt->setTimestamp($s * (int) ceil($dt->getTimestamp() / $s));
+                                echo $dt->getTimestamp() * 1000;
                                 ?>;
 
     </script>
@@ -30,6 +30,7 @@ date_default_timezone_set("UTC");
 <body class="background-primary">
     <div class="game">
         <h1 class="text-light">Guessing Game</h1>
+        <p id="definition" class="word-definition text-light"></p>
         <?php
 
         $attemps = getenv_fallback("ATTEMPTS", 6);
@@ -49,6 +50,7 @@ date_default_timezone_set("UTC");
         ?>
 
         <button class="attempt-btn" onclick="attempt()">Attempt</button>
+        <button class="tip-btn" onclick="tip()">Tip</button>
     </div>
     <div class="container hidden" id="win">
         Your guess was correct!
@@ -59,7 +61,7 @@ date_default_timezone_set("UTC");
     <div class="container" id="next-word">
 
     </div>
-    <script src="js/main.js?r=<?php rand(0, 2**16); ?>"></script>
+    <script src="js/main.js?r=<?php echo rand(0, 2**16); ?>"></script>
 </body>
 
 </html>

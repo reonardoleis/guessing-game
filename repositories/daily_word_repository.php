@@ -3,7 +3,9 @@ require_once(dirname(__DIR__)."/database/database.php");
 
 function create_daily_word($word) {
     $now = date("Y-m-d H:i:s");
-    $sql = "INSERT INTO daily_words (word, created_at, updated_at) VALUES ('$word', '$now', '$now')";
+    $word_content = $word["word"];
+    $word_definition = $word["definition"];
+    $sql = "INSERT INTO daily_words (word, word_definition, created_at, updated_at) VALUES ('$word_content', '$word_definition', '$now', '$now')";
     global $conn;
     $conn->query($sql);
     if ($conn->error) {
@@ -29,7 +31,7 @@ function find_current_word() {
     return $current_word["word"];
 }
 
-function find_current_word_id() {
+function find_current_word_full() {
     $sql = "SELECT * FROM daily_words ORDER BY created_at DESC LIMIT 1";
     global $conn;
     $result = $conn->query($sql);
@@ -42,7 +44,7 @@ function find_current_word_id() {
     }
 
     $current_word = $result->fetch_assoc();
-    return $current_word["id"];
+    return $current_word;
 }
 
 ?>

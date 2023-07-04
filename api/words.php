@@ -16,6 +16,17 @@ function guess_word() {
 
     $word = $req["word"];
     $word = strtolower($word);
+
+    $valid_words = json_decode(file_get_contents("../assets/words.json"), true);
+ 
+    $valid_words = array_map(function($item) {
+        return $item["word"];
+    }, $valid_words);
+
+    if (!in_array($word, $valid_words)) {
+        JSON(array("message" => "Bad Request"), 400);
+        die();
+    }
     
     $current_word = find_current_word();
 
@@ -23,7 +34,6 @@ function guess_word() {
     $current_word_seq = str_split($current_word, 1);
 
     $correct_letters = [false, false, false, false, false];
-    $logs = [];
     for ($i = 0; $i < count($word_seq); $i++) {
         if ($word_seq[$i] == $current_word_seq[$i]) {
             $current_word_letter_count = count(array_keys($current_word_seq, $word_seq[$i]));
@@ -68,26 +78,26 @@ function guess_word() {
        unset($correct_letters[$i]["letter"]);
     }
 
-    echo JSON(array("is_correct" => $word == $current_word, "correct_letters" => $correct_letters, "logs" => $logs) , 200);
+    echo JSON(array("is_correct" => $word == $current_word, "correct_letters" => $correct_letters, "is_valid" => true) , 200);
 
     die();
 }
 
-function get_current_word_id() {
-    $current_word_id = find_current_word_id();
-    if ($current_word_id == null) {
+function get_current_word_information() {
+    $current_word = find_current_word_full();
+    if ($current_word == null) {
         JSON(array("message" => "Internal Server Error"), 500);
         die();
     }
 
-    JSON(array("id" => $current_word_id), 200);
+    JSON(array("id" => $current_word["id"], "definition" => $current_word["word_definition"]), 200);
     die();
 }
 
 if ($method == "POST") {
     return guess_word();
 } else if ($method == "GET") {
-    return get_current_word_id();
+    return get_current_word_information();
 }
 
 ?>

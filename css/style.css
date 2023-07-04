@@ -60,19 +60,29 @@
     border: 3px solid #93827F;
     border-radius: 5px;
     background-color: rgba(0, 0, 0, 0.4);
+    transition: all 0.2s ease-in-out;
     outline: 0;
 }
 
 .input-square.active {
     background-color: rgba(0, 0, 0, 0.0) !important;
+    transition: all 0.2s ease-in-out;
 }
 
 .input-square.correct {
     background-color: #92B4A7 !important;
+    transition: all 0.2s ease-in-out;
 }
 
 .input-square.partial {
     background-color: #F6AE2D !important;
+    transition: all 0.2s ease-in-out;
+}
+
+.input-square.invalid {
+    background-color: #f23219 !important;
+    transition: all 0.2s ease-in-out;
+    transform: scale(1.1);
 }
 
 .input-row {
@@ -99,4 +109,39 @@
     background-color: #a1c5b7;
     transition: all 0.2s ease-in-out;
     cursor: pointer;
+}
+
+.tip-btn {
+    margin-top: 10px;
+    width: 100px;
+    height: 50px;
+    font-size: 20px;
+    font-weight: bolder;
+    border: none;
+    border-radius: 5px;
+    background-color: #d0cb84;
+}
+
+.tip-btn:hover {
+    background-color: #dfda8e;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.word-definition {
+    text-align: center;
+    margin: 0 auto;
+    margin-bottom: 15px !important;
+}
+
+@media (min-width: 768px) {
+    .word-definition {
+        max-width: 50% !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .word-definition {
+        max-width: 90% !important;
+    }
 }

@@ -1,4 +1,4 @@
-const apiURL = `${window.location.href.split('/')[0]}/guessing-game/api`;
+const apiURL = `${window.location.href}/api`;
 const maxAttempts = 6;
 var attempts = 0;
 
@@ -10,6 +10,14 @@ function setLetterSquareListeners() {
             const id = `letter-${i}-${j}`;
             const element = document.getElementById(id);
             element.addEventListener('keyup', (e) => {
+                let char = String.fromCharCode(e.keyCode);
+                if (e.keyCode !== 8 && !/[a-zA-Z]/.test(char)) {
+                    return element.value = '';
+                } else if (/[a-zA-Z]/.test(char)) {
+                    element.value = char;
+                }
+
+
                 if (j > 1) {
                     if (e.keyCode == 8) {
                         const previousId = `letter-${i}-${j - 1}`;
@@ -73,6 +81,20 @@ function handleLettersResult(correctLetters) {
     }
 }
 
+function animateInvalidAttempt() {
+    for (let i = 0; i < 5; i++) {
+        const id = `letter-${currentRow}-${i+1}`;
+        document.getElementById(id).classList.add('invalid');
+    }
+
+    setTimeout(() => {
+        for (let i = 0; i < 5; i++) {
+            const id = `letter-${currentRow}-${i+1}`;
+            document.getElementById(id).classList.remove('invalid');
+        }
+    }, 1000);
+}
+
 async function attempt() {
     const baseId = `letter-${currentRow}-`;
     let attempt = '';
@@ -99,6 +121,10 @@ async function attempt() {
 
     const res = await req.json();
 
+    if (!res.is_valid) {
+        return animateInvalidAttempt();
+    }
+
     
     handleLettersResult(res.correct_letters);
 
@@ -107,15 +133,15 @@ async function attempt() {
 
 
     if (res.is_correct) {
-        const wordID = await getCurrentWordID();
+        const word = await getCurrentWordData();
         localStorage.setItem("result", "win");
-        localStorage.setItem("word_id", wordID);
+        localStorage.setItem("word_id", word.id);
         document.getElementsByClassName("game")[0].style.display = "none";
         document.getElementById("win").style.display = "block";
     } else if(attempts >= maxAttempts) {
-        const wordID = await getCurrentWordID();
+        const word = await getCurrentWordData();
         localStorage.setItem("result", "lose");
-        localStorage.setItem("word_id", wordID);
+        localStorage.setItem("word_id", word.id);
         document.getElementsByClassName("game")[0].style.display = "none";
         document.getElementById("lose").style.display = "block";
     }
@@ -124,6 +150,19 @@ async function attempt() {
 
 
     setActiveRow(currentRow);
+}
+
+async function tip() {
+    let url = `${apiURL}/tip.php`;
+
+    const req = await fetch(url);
+    const res = await req.json();
+
+    const { char, index } = res;
+
+    const id = `letter-${currentRow}-${index + 1}`;
+    const element = document.getElementById(id);
+    element.value = char;
 }
 
 function getTimeToNextWord() {
@@ -136,28 +175,36 @@ function getTimeToNextWord() {
     return `${hours} hours, ${minutes} minutes and ${seconds} seconds`;
 }
 
-setInterval(() => {
+let nextWordTimer = setInterval(() => {
     document.getElementById('next-word').innerText = 'Next word in ' + getTimeToNextWord();
+    let now = new Date();
+    let now_utc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds());
+    let diff = nextWordTimestamp - now_utc;
+    if (diff <= 0) {
+        clearInterval(nextWordTimer);
+        document.getElementById('next-word').innerText = 'The page will be reloaded in 5 seconds.';
+        setTimeout(() => { location.reload() }, 5000);
+    }
 }, 1000);
 
 if (localStorage.getItem("result")) {
     handleDailyWord();
 }
 
-async function getCurrentWordID() {
+async function getCurrentWordData() {
     const url = `${apiURL}/words.php`;
     const req = await fetch(url, {
         method: 'GET'
     });
 
     const res = await req.json();
-    return res.id;
+    return res;
 }
 
 async function handleDailyWord() {
-    const wordID = await getCurrentWordID();
+    const word = await getCurrentWordData();
     const savedWordID = localStorage.getItem("word_id");
-    if (wordID != savedWordID) {
+    if (word.id != savedWordID) {
         localStorage.removeItem("result");
         localStorage.removeItem("word_id");
     } else {
@@ -169,4 +216,12 @@ async function handleDailyWord() {
             document.getElementById("lose").style.display = "block";
         }
     }
+}
+
+window.onload = async function(e){
+    let word = await getCurrentWordData();
+    document.getElementById("definition").innerText = word.definition;
+    let divs = document.getElementsByTagName('div');
+    if (divs[divs.length - 1].classList.contains('container')) return;
+    divs[divs.length - 1].style.display = 'none';   
 }
